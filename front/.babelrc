@@ -1,0 +1,10 @@
+{
+    "presets" : ["next/babel"],
+    "plugins": [
+        ["babel-plugin-styled-components", {
+            "ssr" : true, //서버사이드 렌더링 트루!!!
+            "displayName" : true //생성되는 컴포넌트의 클래스 이름들이 내가 알기 쉽게 변경됨
+            //내가 생선한 컴포넌트의 이름과 같아짐?
+        }]
+    ]
+}
