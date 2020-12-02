@@ -13,16 +13,24 @@ const passport = require('passport')
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const path = require('path');
-
+const hpp = require('hpp');
+const helmet = require('helmet');
 dotenv.config();
 const app = express();
 
-app.use(morgan('dev'));
+if(process.env.NODE_ENV === 'production') {
+    app.use(morgan('combine'));
+    app.use(hpp());
+    app.use(helmet());
+}else {
+    app.use(morgan('dev'));
+}
+
 
 app.use('/', express.static(path.join(__dirname, 'uploads'))); // /경로가 localhost:3065/ 를 말함.
 //즉 uploads 폴더까지를 그냥 /로 퉁치는것!
 app.use(cors({
-    origin: true, //이부분이 이제 주소 거르는곳이긴한데,
+    origin: ['http://localhost:3060', 'nodebird.com'], //이부분이 이제 주소 거르는곳이긴한데,
     credentials: true, //이걸 해야 쿠키도 같이 전달해준다 다른 도메인 상에서.
 }));
 app.use(express.json());
@@ -42,6 +50,9 @@ db.sequelize.sync()
 }).catch(console.error);
 
 passportConfig();
+
+
+
 
 app.get('/', (req,res) => {
     res.send('hello express');
@@ -69,7 +80,7 @@ app.use((err, req, res, next) => {
     
 });
 
-app.listen(3065, () => {
+app.listen(80, () => {
     console.log('서버 실행 중!!');
 }); 
 
