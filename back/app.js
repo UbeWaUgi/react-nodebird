@@ -30,7 +30,7 @@ if(process.env.NODE_ENV === 'production') {
 app.use('/', express.static(path.join(__dirname, 'uploads'))); // /경로가 localhost:3065/ 를 말함.
 //즉 uploads 폴더까지를 그냥 /로 퉁치는것!
 app.use(cors({
-    origin: ['http://localhost:3060', 'nodebird.com', 'http://54.180.24.227'], //이부분이 이제 주소 거르는곳이긴한데,
+    origin: ['http://localhost:3060', 'http://ubewaugi.com' ,'http://www.ubewaugi.com', 'https://www.ubewaugi.com'], //이부분이 이제 주소 거르는곳이긴한데,
     credentials: true, //이걸 해야 쿠키도 같이 전달해준다 다른 도메인 상에서.
 }));
 app.use(express.json());
@@ -40,6 +40,11 @@ app.use(session({
     saveUninitialized : false,
     resave: false,
     secret: process.env.COOKIE_SECRET,
+    cookie: {
+        httpOnly: true, //자바스크립트는 불가능하게, 변형되면 안되니
+        secure: false,
+        domain: process.env.NODE_ENV === 'production' && '.ubewaugi.com' //api.ubewaugi 와 그냥 ubewaugi 사이 쿠키 공유가됨.
+    }
 })); // 세션을 위한 설정
 app.use(passport.initialize()); // 세션을 위한 설정
 app.use(passport.session()); // 세션을 위한 설정

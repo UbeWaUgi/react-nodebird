@@ -1,1 +1,1 @@
-export const backUrl = 'http://13.125.176.70';
+export const backUrl = 'http://api.ubewaugi.com';
