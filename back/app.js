@@ -22,17 +22,22 @@ if(process.env.NODE_ENV === 'production') {
     app.use(morgan('combine'));
     app.use(hpp());
     app.use(helmet());
+    app.use(cors({
+        origin: ['http://ubewaugi.com' ,'http://www.ubewaugi.com', 'https://www.ubewaugi.com'], //이부분이 이제 주소 거르는곳이긴한데,
+        credentials: true, //이걸 해야 쿠키도 같이 전달해준다 다른 도메인 상에서.
+    }));
 }else {
     app.use(morgan('dev'));
+    app.use(cors({
+        origin: true,
+        credentials: true, //이걸 해야 쿠키도 같이 전달해준다 다른 도메인 상에서.
+    }));
 }
 
 
 app.use('/', express.static(path.join(__dirname, 'uploads'))); // /경로가 localhost:3065/ 를 말함.
 //즉 uploads 폴더까지를 그냥 /로 퉁치는것!
-app.use(cors({
-    origin: ['http://localhost:3060', 'http://ubewaugi.com' ,'http://www.ubewaugi.com', 'https://www.ubewaugi.com'], //이부분이 이제 주소 거르는곳이긴한데,
-    credentials: true, //이걸 해야 쿠키도 같이 전달해준다 다른 도메인 상에서.
-}));
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true})); //req.body?? 이런거 처리하려고 설정한것일듯.
 app.use(cookieParser(process.env.COOKIE_SECRET));
