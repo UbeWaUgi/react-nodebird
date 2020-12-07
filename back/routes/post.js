@@ -5,6 +5,9 @@ const router = express.Router();
 const { Post, Image, Comment, User, Hashtag } = require('../models');
 const {isLoggedIn} = require('./middlewares');
 const fs = require('fs');
+const multerS3 = require('multer-s3');
+const AWS= require('aws-sdk');
+
 
 try{
     fs.accessSync('uploads');
@@ -13,7 +16,26 @@ try{
     fs.mkdirSync('uploads');
 }
 
+AWS.config.update({
+    accessKeyId:process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    region: 'ap-northeast-2',
+})
 
+
+const upload = multer({
+    storage: multerS3({
+        s3: new AWS.S3(), //s3권한을 얻는다.
+        bucket: 'ubewaugi-s3',
+        key(req, file, cb) { //저장되는 파일 이름.
+            cb(null, `original/${Date.now()}_${path.basename(file.originalname)}`)
+        },
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  });
+
+/*
+서버 로컬을 사용하는 방법.
 const upload = multer({
     storage: multer.diskStorage({
       destination(req, file, done) {
@@ -29,7 +51,7 @@ const upload = multer({
     }),
     limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
   });
-
+*/
 router.post('/', isLoggedIn, upload.none(), async(req,res, next) => {
     try{
        const post = await Post.create({
@@ -245,7 +267,8 @@ router.delete('/:postId',isLoggedIn, async(req,res, next) => { // DELETE /post/1
 
   router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => { // POST /post/images
     console.log(req.files);
-    res.json(req.files.map((v) => v.filename));
+    //res.json(req.files.map((v) => v.filename)); 로컬 서버 내부에 저장할때
+    res.json(req.files.map((v) => v.location)); //s3에 저장할때
   });
 
 
