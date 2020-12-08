@@ -4,7 +4,7 @@ const sharp = require('sharp');
 const s3 = new AWS.S3();
 //
 
-exports.handlerLambda = (event, context, callback) => {
+exports.handlerLambda = async(event, context, callback) => {
     //event에 s3에 대핸 이벤트가 존재 즉 파일이 들어갔을때 감지하는 event도 있을꺼란 말씀.
     const Bucket = event.Records[0].s3.bucket.name; // s3이름 ubewaugi-s3
     const Key = decodeURIComponent(event.Records[0].s3.object.key); // ex) original/12312312_abc.png
