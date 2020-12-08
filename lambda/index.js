@@ -15,7 +15,7 @@ exports.handlerLambda = async(event, context, callback) => {
     console.log('filename', filename, 'ext', ext);
 
     try{
-        const srObject = await s3.getObject({Bucket, Key}).promise();
+        const s3Object = await s3.getObject({Bucket, Key}).promise();
         console.log('original', s3Object.Body.length);//Body에 바이너리가 저장되어있고, 몇 바이트인지 확인
         const resizedImage = await sharp(s3Object.Body)
         .resize(400,400, {fit: 'inside'})
