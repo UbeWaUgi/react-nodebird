@@ -268,7 +268,7 @@ router.delete('/:postId',isLoggedIn, async(req,res, next) => { // DELETE /post/1
   router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => { // POST /post/images
     console.log(req.files);
     //res.json(req.files.map((v) => v.filename)); 로컬 서버 내부에 저장할때
-    res.json(req.files.map((v) => v.location)); //s3에 저장할때
+    res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/'))); //s3에 저장할때
   });
 
 
