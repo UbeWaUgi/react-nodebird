@@ -19,12 +19,14 @@ dotenv.config();
 const app = express();
 
 if(process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); // nginx를이용해 리버스 프록시를 이용하니까 이 설정 추가
     app.use(morgan('combine'));
     app.use(hpp());
     app.use(helmet());
     app.use(cors({
-        origin: ['http://ubewaugi.com' ,'http://www.ubewaugi.com', 'https://www.ubewaugi.com'], //이부분이 이제 주소 거르는곳이긴한데,
+        origin: ['http://ubewaugi.com' ,'https://ubewaugi.com','http://www.ubewaugi.com', 'https://www.ubewaugi.com'], //이부분이 이제 주소 거르는곳이긴한데,
         credentials: true, //이걸 해야 쿠키도 같이 전달해준다 다른 도메인 상에서.
+        //도메인이 다르면 쿠키도 안보냄 원래 그럼 그래서 이 옵션을 사용.
     }));
 }else {
     app.use(morgan('dev'));
@@ -45,9 +47,10 @@ app.use(session({
     saveUninitialized : false,
     resave: false,
     secret: process.env.COOKIE_SECRET,
+    proxy:true,
     cookie: {
         httpOnly: true, //자바스크립트는 불가능하게, 변형되면 안되니
-        secure: false,
+        secure: true, //ssl적용했으니 true
         domain: process.env.NODE_ENV === 'production' && '.ubewaugi.com' //api.ubewaugi 와 그냥 ubewaugi 사이 쿠키 공유가됨.
     }
 })); // 세션을 위한 설정
@@ -90,7 +93,7 @@ app.use((err, req, res, next) => {
     
 });
 
-app.listen(80, () => {
+app.listen(3065, () => {
     console.log('서버 실행 중!!');
 }); 
 
