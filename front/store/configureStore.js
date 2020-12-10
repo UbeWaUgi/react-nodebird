@@ -35,7 +35,7 @@ const configureStore = () => {
     : composeWithDevTools(applyMiddleware(...middlewares));
     // 리덕스 히스토리를 보기위한 미들웨어 설정 배포 상태와 dev 상태를 나누어서 따로따로 적용해줘야함.
     // 히스토리가 쌓이면 메모리문제와, 그 데이터가 다 보이므로 보안 문제가 있어서,
-    // 그래서 배포용은 devtools에 연결하고, 개발용은 devtools에 연결한다.
+    // 그래서 배포용은 compose 연결하고, 개발용은 devtools에 연결한다.
 
   const store = createStore(reducer, enhancer); // devtools연동을위한 enhancer 추가.
 

@@ -106,8 +106,7 @@ function* watchAddPost() {
 function* addComment(action) {
   try {
     const result = yield call(addCommentAPI, action.data);
-    console.log('test');
-    console.log(result);
+
     yield put({
       type: ADD_COMMENT_SUCCESS,
       data: result.data,
@@ -128,8 +127,7 @@ function* removePost(action) {
       type: REMOVE_POST_SUCCESS,
       data: result.data,
     });
-    console.log('test');
-    console.log(result);
+
     yield put({
       type: REMOVE_POST_TO_ME,
       data: result.data.PostId,

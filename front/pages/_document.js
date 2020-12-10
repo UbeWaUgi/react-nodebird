@@ -6,12 +6,12 @@ export default class MyDocument extends Document {
   static async getInitialProps(ctx) {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
-    console.log('test1');
+
     try {
       ctx.rednerPage = () => originalRenderPage({
         enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
       }); // serverside Rendering 부분
-      console.log('test2');
+
       const initialProps = await Document.getInitialProps(ctx);
       return {
         ...initialProps,

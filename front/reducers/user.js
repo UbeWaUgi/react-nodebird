@@ -102,20 +102,16 @@ export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
 export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
 export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
 
-export const loginRequestAction = (data) => {
-  console.log(data);
-  return {
-    type: LOG_IN_REQUEST,
-    data,
-  };
-};
+export const loginRequestAction = (data) => ({
+  type: LOG_IN_REQUEST,
+  data,
+});
 
 export const logOutRequestAction = () => ({
   type: LOG_OUT_REQUEST,
 });
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
-  console.log(action);
   switch (action.type) {
     case REMOVE_FOLLOWER_REQUEST:
       draft.removeFollowerLoading = true;
@@ -257,8 +253,6 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.signUpError = action.error;
       break;
     case CHANGE_NICKNAME_REQUEST:
-      console.log('testtest');
-      console.log(action);
       draft.changeNicknameLoading = true;
       draft.changeNicknameDone = false;
       draft.changeNicknameError = null;
@@ -276,7 +270,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.me.Posts.unshift({ id: action.data });
       break;
     case REMOVE_POST_TO_ME:
-      console.log(action);
+
       draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
       break;
     default:

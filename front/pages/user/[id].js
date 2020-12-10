@@ -27,9 +27,7 @@ const User = () => {
 
       if (window.scrollY + document.documentElement.clientHeight
         > document.documentElement.scrollHeight - 300) {
-        console.log('test!!!');
         if (hasMorePost && !loadPostsLoading) {
-          console.log('testestsetset');
           dispatch({
             type: LOAD_USER_POSTS_REQUEST,
             lastId: mainPosts[mainPosts.length - 1] && mainPosts[mainPosts.length - 1].id,

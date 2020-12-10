@@ -11,8 +11,6 @@ import { LOG_IN_REQUEST, LOG_IN_SUCCESS,
   REMOVE_FOLLOWER_FAILURE, LOAD_USER_SUCCESS, LOAD_USER_REQUEST, LOAD_USER_FAILURE } from '../reducers/user';
 
 function logInAPI(data) {
-  // console.log('test');
-  // console.log(data);
   return axios.post('/user/login', data);
 }
 
@@ -99,9 +97,8 @@ function removeFollowerAPI(data) {
 
 function* signUp(action) {
   try {
-    console.log(action);
     const result = yield call(signUpAPI, action.data);
-    console.log(result);
+
     yield put({
       type: SIGN_UP_SUCCESS,
       data: result.data,

@@ -91,7 +91,6 @@ export const addComment = (data) => ({
 });
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
-  console.log(action);
   // state가 draft로 바뀜.
   switch (action.type) {
     case REMOVE_IMAGE:
@@ -215,7 +214,6 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.removePostError = null;
       break;
     case REMOVE_POST_SUCCESS: {
-      console.log(action.data);
       draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data.PostId);
       // 이렇게 하는 이유는, 게시글은 최신순 이므로
       // 그 앞에다가 즉 그 원래 state의 mainPosts 앞에다가 두게하려고 최신글을!
