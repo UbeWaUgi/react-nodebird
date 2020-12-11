@@ -116,6 +116,57 @@ router.post('/', isLoggedIn, upload.none(), async(req,res, next) => {
 });
 
 
+router.patch('/:postId', async(req,res,next) => {
+    try{
+
+        await Post.update({
+            content: req.body.content
+        }, {
+            where : {
+                id: req.params.ppostId,
+                UserId: req.user.id,
+            }
+        });
+
+        /*
+        내버전
+        const post = await Post.findOne({
+            where : {id: req.params.postId},
+            include : [{
+                model: Image,
+            }]
+        })
+
+        if(!post) {
+            return res.status(404).send('존재하지 않는 게시글입니다.');
+        }
+
+        await post.update({
+            content : req.body.content,
+        })
+        */
+        
+
+/*
+        if(req.body.image){
+            //이미지가 여러개인경우에는 image: [1.png, 2.png] 처럼 배열로오고,
+            if(Array.isArray(req.body.image)){
+              const images =  await Promise.all(req.body.image.map((image) => Image.create({src: image})));
+                await post.addImages(images);
+            }else { //이미지가 하나인경우에는 image : 1.png 이런식으로옴
+                const image = await Image.create({src: req.body.image});
+                await post.addImages(image);
+            }
+        }
+*/
+     
+    res.status(200).json({PostId : parseInt(req.params.postId, 10), content : req.body.content });
+    }catch (err) {
+        console.error(error);
+        next(error);
+    }
+});
+
 router.get('/:postId', async(req,res, next) => {
     try{
         const post = await Post.findOne({

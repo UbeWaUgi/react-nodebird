@@ -14,6 +14,9 @@ export const initialState = {
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
+  updatePostLoading: false,
+  updatePostDone: false,
+  updatePostError: null,
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
@@ -61,6 +64,10 @@ export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const UPDATE_POST_REQUEST = 'UPDATE_POST_REQUEST';
+export const UPDATE_POST_SUCCESS = 'UPDATE_POST_SUCCESS';
+export const UPDATE_POST_FAILURE = 'UPDATE_POST_FAILURE';
 
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
@@ -208,6 +215,22 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.addPostLoading = false;
       draft.addPostError = action.error;
       break;
+    case UPDATE_POST_REQUEST:
+      draft.updatePostLoading = true;
+      draft.updatePostDone = false;
+      draft.updatePostError = null;
+      break;
+    case UPDATE_POST_SUCCESS:
+      draft.updatePostLoading = false;
+      draft.updatePostDone = true;
+      draft.mainPosts = draft.mainPosts.find((v) => (v.id === action.data.PostId
+        ? { content: action.data.content,
+        } : v));
+      break;
+    case UPDATE_POST_FAILURE:
+      draft.updatePostLoading = false;
+      draft.updatePostError = action.error;
+      break;
     case REMOVE_POST_REQUEST:
       draft.removePostLoading = true;
       draft.removePostDone = false;
@@ -215,8 +238,6 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       break;
     case REMOVE_POST_SUCCESS: {
       draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data.PostId);
-      // 이렇게 하는 이유는, 게시글은 최신순 이므로
-      // 그 앞에다가 즉 그 원래 state의 mainPosts 앞에다가 두게하려고 최신글을!
       draft.removePostLoading = false;
       draft.removePostDone = true;
       break;
