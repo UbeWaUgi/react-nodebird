@@ -37,12 +37,15 @@ const PostCardContent = ({ postData, editMode, onCancleUpdate,
             </>
           )
           : (
-            postData.split(/(#[^\s#]+)/g).map((v) => {
-              if (v.match(/(#[^\s#]+)/)) {
-                return <Link href={`/hashtag/${v.slice(1)}`} prefetch={false} key={v}><a>{v}</a></Link>;
-              }
-              return v;
-            }))}
+            <>
+              {postData.split(/(#[^\s#]+)/g).map((v) => {
+                if (v.match(/(#[^\s#]+)/)) {
+                  return <Link href={`/hashtag/${v.slice(1)}`} prefetch={false} key={v}><a>{v}</a></Link>;
+                }
+                return v;
+              })}
+            </>
+          )}
       </div>
     </>
   );
