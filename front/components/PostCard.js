@@ -33,11 +33,11 @@ const PostCard = ({ post }) => {
     return dispatch({
       type: UPDATE_POST_REQUEST,
       data: {
-        PostId: post.id,
+        postId: post.id,
         content: editText,
       },
     });
-  }, [id]);
+  }, [id, post]);
 
   const onLike = useCallback(() => {
     if (!id) {

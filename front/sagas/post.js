@@ -49,7 +49,7 @@ function retweetAPI(data) {
 }
 
 function updatePostAPI(data) {
-  return axios.patch(`/post/${data.id}`, data);
+  return axios.patch(`/post/${data.postId}`, data);
 }
 
 function* likePost(action) {
