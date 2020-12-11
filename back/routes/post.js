@@ -161,7 +161,7 @@ router.patch('/:postId', async(req,res,next) => {
 */
      
     res.status(200).json({PostId : parseInt(req.params.postId, 10), content : req.body.content });
-    }catch (err) {
+    }catch (error) {
         console.error(error);
         next(error);
     }
