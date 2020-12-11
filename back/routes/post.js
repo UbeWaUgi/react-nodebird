@@ -123,10 +123,32 @@ router.patch('/:postId', async(req,res,next) => {
             content: req.body.content
         }, {
             where : {
-                id: req.params.ppostId,
+                id: req.params.postId,
                 UserId: req.user.id,
             }
         });
+
+        const post = await Post.findOne({
+            where : {id: req.params.postId},
+        })
+
+        const hashtags = req.body.content.match(/(#[^\s#]+)/g);
+
+        if(hashtags) {
+            const result = await Promise.all(hashtags.map((tag) => Hashtag.findOrCreate({where :{name: tag.slice(1).toLowerCase()}})))
+            
+        // [[노드, true], [리액트 , true]]
+
+        console.log(result);
+        await post.setHashtags(result.map((v) => v[0])) //이렇게하는 이유는
+        //위처럼 데이터가 결과가 나오기 때문,
+        //set은 내가 만약 기존 hashtag 중 몇개를 지웠어, 그리고 새로 넣었어,
+        //그러면 지워진거는 없애지고, 새로넣은거는 들어가
+        //그러면 add는? 기존없애진거 그대로 남아있고, 새로넣은것도 들어가.
+        //그러면 어디가 지워지는걸까? hashtag? posthashtag?? 확인해보자.
+
+    } 
+
 
         /*
         내버전
