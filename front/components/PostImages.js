@@ -11,7 +11,7 @@ const ImgStyle = styled.img`
     width:50%;
     display: inline-block;
 `;
-
+// .replace(/\/thumb\//, '/original/') 이부분 제거할꺼임 지금당장 해결못해서 임시로 해놓은것.
 const PostImages = ({ images }) => {
   const [showImagesZoom, setShowImagesZoom] = useState(false);
 
@@ -29,7 +29,7 @@ const PostImages = ({ images }) => {
         <img
           role="presentation"
           src={process.env.NODE_ENV === 'production'
-            ? (`${images[0].src}`) : (`${backUrl}/${images[0].src}`)}
+            ? (`${images[0].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[0].src}`)}
           alt={images[0].src}
           onClick={onZoom}
         />
@@ -44,7 +44,7 @@ const PostImages = ({ images }) => {
           style={{ width: '50%', display: 'inline-block' }}
           src={process.env.NODE_ENV === 'production'
             ? (`${images[0].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[0].src}`)}
-          alt={images[0].src.replace(/\/thumb\//, '/original/')}
+          alt={images[0].src}
           onClick={onZoom}
         />
         <ImgStyle
@@ -52,7 +52,7 @@ const PostImages = ({ images }) => {
           style={{ width: '50%', display: 'inline-block' }}
           src={process.env.NODE_ENV === 'production'
             ? (`${images[1].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[1].src}`)}
-          alt={images[1].src.replace(/\/thumb\//, '/original/')}
+          alt={images[1].src}
           onClick={onZoom}
         />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
@@ -66,7 +66,7 @@ const PostImages = ({ images }) => {
           style={{ width: '50%', display: 'inline-block' }}
           src={process.env.NODE_ENV === 'production'
             ? (`${images[0].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[0].src}`)}
-          alt={images[0].src.replace(/\/thumb\//, '/original/')}
+          alt={images[0].src}
           onClick={onZoom}
         />
         <div
