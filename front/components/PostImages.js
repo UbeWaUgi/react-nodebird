@@ -43,16 +43,16 @@ const PostImages = ({ images }) => {
           role="presentation"
           style={{ width: '50%', display: 'inline-block' }}
           src={process.env.NODE_ENV === 'production'
-            ? (`${images[0].src}`) : (`${backUrl}/${images[0].src}`)}
-          alt={images[0].src}
+            ? (`${images[0].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[0].src}`)}
+          alt={images[0].src.replace(/\/thumb\//, '/original/')}
           onClick={onZoom}
         />
         <ImgStyle
           role="presentation"
           style={{ width: '50%', display: 'inline-block' }}
           src={process.env.NODE_ENV === 'production'
-            ? (`${images[1].src}`) : (`${backUrl}/${images[1].src}`)}
-          alt={images[1].src}
+            ? (`${images[1].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[1].src}`)}
+          alt={images[1].src.replace(/\/thumb\//, '/original/')}
           onClick={onZoom}
         />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
@@ -65,8 +65,8 @@ const PostImages = ({ images }) => {
           role="presentation"
           style={{ width: '50%', display: 'inline-block' }}
           src={process.env.NODE_ENV === 'production'
-            ? (`${images[0].src}`) : (`${backUrl}/${images[0].src}`)}
-          alt={images[0].src}
+            ? (`${images[0].src.replace(/\/thumb\//, '/original/')}`) : (`${backUrl}/${images[0].src}`)}
+          alt={images[0].src.replace(/\/thumb\//, '/original/')}
           onClick={onZoom}
         />
         <div
