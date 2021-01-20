@@ -23,7 +23,9 @@ AWS.config.update({
 })
 
 
-const upload = multer({
+const upload = process.env.NODE_ENV === 'production' ? (
+    //배포용 aws s3사용
+multer({
     storage: multerS3({
         s3: new AWS.S3(), //s3권한을 얻는다.
         bucket: 'ubewaugi-s3',
@@ -32,7 +34,25 @@ const upload = multer({
         },
     }),
     limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
-  });
+  })) : (
+      //로컬 스토리지 사용
+    multer({
+        storage: multer.diskStorage({
+          destination(req, file, done) {
+            done(null, 'uploads');
+          },
+          filename(req, file, done) { // 제로초.png
+            const ext = path.extname(file.originalname); // 확장자 추출(.png)
+            //console.log(ext);
+            const basename = path.basename(file.originalname, ext); // 제로초
+            //console.log(basename);
+            done(null, basename + '_' + new Date().getTime() + ext); // 제로초15184712891.png
+          },
+        }),
+        limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+      })
+  );
+
 
 /*
 서버 로컬을 사용하는 방법.
@@ -75,9 +95,9 @@ router.post('/', isLoggedIn, upload.none(), async(req,res, next) => {
 
         if(hashtags) {
             const result = await Promise.all(hashtags.map((tag) => Hashtag.findOrCreate({where :{name: tag.slice(1).toLowerCase()}})))
-        
         // [[노드, true], [리액트 , true]]
 
+        console.log('TESTESTESTSETSETSETSETSET');
         console.log(result);
         await post.addHashtags(result.map((v) => v[0])) //이렇게하는 이유는
         //위처럼 데이터가 결과가 나오기 때문,
@@ -118,7 +138,7 @@ router.post('/', isLoggedIn, upload.none(), async(req,res, next) => {
 
 router.patch('/:postId', async(req,res,next) => {
     try{
-
+        console.log(req.body.content);
         await Post.update({
             content: req.body.content
         }, {
@@ -136,10 +156,9 @@ router.patch('/:postId', async(req,res,next) => {
 
         if(hashtags) {
             const result = await Promise.all(hashtags.map((tag) => Hashtag.findOrCreate({where :{name: tag.slice(1).toLowerCase()}})))
-            
+
         // [[노드, true], [리액트 , true]]
 
-        console.log(result);
         await post.setHashtags(result.map((v) => v[0])) //이렇게하는 이유는
         //위처럼 데이터가 결과가 나오기 때문,
         //set은 내가 만약 기존 hashtag 중 몇개를 지웠어, 그리고 새로 넣었어,
@@ -148,6 +167,37 @@ router.patch('/:postId', async(req,res,next) => {
         //그러면 어디가 지워지는걸까? hashtag? posthashtag?? 확인해보자.
 
     } 
+
+    if(req.body.image) {
+        if(Array.isArray(req.body.image)){
+            //const images =  await Promise.all(req.body.image.map((image) => Image.create({src: image})));
+            const images =  await Promise.all(req.body.image.map((image) => Image.findOrCreate({where: 
+                {
+                    src: image,
+                    PostId: post.id
+            }
+            })));
+            //const images =  await Promise.all(req.body.image.map((image) => Image.create({src: image})));
+              await post.setImages(images.map((v) => v[0]));
+          }else { //이미지가 하나인경우에는 image : 1.png 이런식으로옴
+              const image = await Image.findOrCreate({where: {src: req.body.image, PostId: post.id}});
+              await post.setImages(images[0]);
+          }
+    }
+
+    
+    /*
+        if(req.body.image){
+            //이미지가 여러개인경우에는 image: [1.png, 2.png] 처럼 배열로오고,
+            if(Array.isArray(req.body.image)){
+              const images =  await Promise.all(req.body.image.map((image) => Image.create({src: image})));
+                await post.addImages(images);
+            }else { //이미지가 하나인경우에는 image : 1.png 이런식으로옴
+                const image = await Image.create({src: req.body.image});
+                await post.addImages(image);
+            }
+        }
+*/
 
 
         /*
@@ -167,22 +217,21 @@ router.patch('/:postId', async(req,res,next) => {
             content : req.body.content,
         })
         */
-        
+       const PatchPost = await Post.findOne({
+        attributes: ['id','content'],
+        where : { id: post.id },
+        include: [{
+            model : Image,
+        },
+    ]
+    })
 
-/*
-        if(req.body.image){
-            //이미지가 여러개인경우에는 image: [1.png, 2.png] 처럼 배열로오고,
-            if(Array.isArray(req.body.image)){
-              const images =  await Promise.all(req.body.image.map((image) => Image.create({src: image})));
-                await post.addImages(images);
-            }else { //이미지가 하나인경우에는 image : 1.png 이런식으로옴
-                const image = await Image.create({src: req.body.image});
-                await post.addImages(image);
-            }
-        }
-*/
+
+
+
      
-    res.status(200).json({PostId : parseInt(req.params.postId, 10), content : req.body.content });
+    //res.status(200).json({PostId : parseInt(req.params.postId, 10), content : req.body.content });
+    res.status(200).json(PatchPost);
     }catch (error) {
         console.error(error);
         next(error);
@@ -336,15 +385,25 @@ router.delete('/:postId',isLoggedIn, async(req,res, next) => { // DELETE /post/1
     }
 });
 
+router.post('/:postId/images', isLoggedIn, upload.array('image'), (req, res, next) => { // POST /post/images
+    console.log(req.files);
+    
 
+    process.env.NODE_ENV === 'production' ? (res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/')))) 
+    : (res.json(req.files.map((v) => v.filename)));
+    //res.json(req.files.map((v) => v.filename)); 로컬 서버 내부에 저장할때
+    //res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/'))); //s3에 저장할때
+  });
 
   router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => { // POST /post/images
     console.log(req.files);
+    
+
+    process.env.NODE_ENV === 'production' ? (res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/')))) 
+    : (res.json(req.files.map((v) => v.filename)));
     //res.json(req.files.map((v) => v.filename)); 로컬 서버 내부에 저장할때
-    res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/'))); //s3에 저장할때
+    //res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/'))); //s3에 저장할때
   });
-
-
 
   router.post('/:postId/retweet', isLoggedIn, async(req,res, next) => {
     try{

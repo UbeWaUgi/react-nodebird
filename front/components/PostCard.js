@@ -8,36 +8,50 @@ import moment from 'moment';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import PostCardContent from './PostCardContent';
-import { REMOVE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST, UPDATE_POST_REQUEST } from '../reducers/post';
+import { REMOVE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST, UPDATE_POST_REQUEST, CANCLE_UPDATE_POST } from '../reducers/post';
 import FollowButton from './FollowButton';
 
 moment.locale('ko'); // 한글로 바꿔주고,
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
-  const { removePostLoading } = useSelector((state) => state.post);
+  const { removePostLoading, updatePostDone } = useSelector((state) => state.post);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
   const id = useSelector((state) => state.user.me?.id);
   const liked = post.Likers.find((v) => v.id === id);
   const [editMode, setEditMode] = useState(false);
 
-  const onCancleUpdate = useCallback(() => {
-    setEditMode(false);
-  }, []);
+  // 취소시 이미지 수정한거 되돌리기.
+  // 맨처음 실행될때 post.Images가 변하지 않은상태에서 한번 실행되기때문에,
+  // 이렇게해도 원래값이 변하지 않음.
 
-  const onChangePost = useCallback((editText) => () => {
+  const updateForSetEdit = useCallback(() => {
+    if (editMode) {
+      setEditMode(false);
+    }
+  }, [editMode]);
+
+  useEffect(() => {
+    updateForSetEdit();
+  }, [updatePostDone]);
+
+  const onChangePost = useCallback((editText) => async () => {
     if (!id) {
       return alert('로그인이 필요합니다.');
     }
 
+    const images = [];
+    post.Images.map((p) => images.push(p.src));
     return dispatch({
       type: UPDATE_POST_REQUEST,
       data: {
-        postId: post.id,
+        image: images,
         content: editText,
       },
+      postId: post.id,
+
     });
-  }, [id, post]);
+  }, [id, post, post.Images]);
 
   const onLike = useCallback(() => {
     if (!id) {
@@ -69,8 +83,6 @@ const PostCard = ({ post }) => {
     if (!id) {
       return alert('로그인이 필요합니다.');
     }
-    // console.log(post);
-    // console.log(post.id);
     return dispatch({
       type: REMOVE_POST_REQUEST,
       data: post.id,
@@ -111,7 +123,7 @@ const PostCard = ({ post }) => {
   return (
     <div style={{ marginBottom: 20 }}>
       <Card
-        cover={post.Images[0] && <PostImages images={post.Images} />}
+        cover={!editMode ? post.Images[0] && <PostImages images={post.Images} /> : ''}
         actions={[
           <RetweetOutlined key="retweet" onClick={onRetweet} />,
           liked
@@ -150,7 +162,9 @@ const PostCard = ({ post }) => {
                 description={(
                   <PostCardContent
                     postData={post.Retweet.content}
-                    onCancleUpdate={onCancleUpdate}
+                    postId={post.id}
+                    postImages={post.Images}
+                    setEditMode={setEditMode}
                     onChangePost={onChangePost}
                   />
 )}
@@ -167,7 +181,9 @@ const PostCard = ({ post }) => {
                   <PostCardContent
                     editMode={editMode}
                     postData={post.content}
-                    onCancleUpdate={onCancleUpdate}
+                    postId={post.id}
+                    postImages={post.Images}
+                    setEditMode={setEditMode}
                     onChangePost={onChangePost}
                   />
 )}

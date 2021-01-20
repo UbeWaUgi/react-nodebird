@@ -9,7 +9,10 @@ import { ADD_POST_REQUEST, ADD_POST_SUCCESS, ADD_POST_FAILURE,
   RETWEET_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE, LOAD_POST_REQUEST, LOAD_POST_SUCCESS,
   LOAD_POST_FAILURE, LOAD_USER_POSTS_REQUEST, LOAD_HASHTAG_POSTS_REQUEST, LOAD_USER_POSTS_SUCCESS,
   LOAD_USER_POSTS_FAILURE, LOAD_HASHTAG_POSTS_SUCCESS, LOAD_HASHTAG_POSTS_FAILURE,
-  UPDATE_POST_REQUEST, UPDATE_POST_SUCCESS, UPDATE_POST_FAILURE } from '../reducers/post';
+  UPDATE_POST_REQUEST, UPDATE_POST_SUCCESS, UPDATE_POST_FAILURE,
+  UPDATE_IMAGES_REQUEST, UPDATE_IMAGES_SUCCESS, UPDATE_IMAGES_FAILURE,
+  LOAD_RELATE_POSTS_REQUEST, LOAD_RELATE_POSTS_SUCCESS, LOAD_RELATE_POSTS_FAILURE,
+  LOAD_UNRELATE_POSTS_REQUEST, LOAD_UNRELATE_POSTS_SUCCESS, LOAD_UNRELATE_POSTS_FAILURE } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_TO_ME } from '../reducers/user';
 
 function addPostAPI(data) {
@@ -44,12 +47,16 @@ function uploadImagesAPI(data) {
   return axios.post('/post/images', data);
 }
 
+function updateImagesAPI(data, postId) {
+  return axios.post(`/post/${postId}/images`, data);
+}
+
 function retweetAPI(data) {
   return axios.post(`/post/${data}/retweet`);
 }
 
-function updatePostAPI(data) {
-  return axios.patch(`/post/${data.postId}`, data);
+function updatePostAPI(data, postId) {
+  return axios.patch(`/post/${postId}`, data);
 }
 
 function* likePost(action) {
@@ -108,8 +115,7 @@ function* addPost(action) {
 
 function* updatePost(action) {
   try {
-    const result = yield call(updatePostAPI, action.data);
-
+    const result = yield call(updatePostAPI, action.data, action.postId);
     yield put({
       type: UPDATE_POST_SUCCESS,
       data: result.data,
@@ -211,6 +217,25 @@ function* uploadImages(action) {
   }
 }
 
+function* updateImages(action) {
+  try {
+    const result = yield call(updateImagesAPI, action.data, action.postId);
+    yield put({
+      type: UPDATE_IMAGES_SUCCESS,
+      data: { PostId: action.postId,
+        src: result.data[0],
+      },
+      postId: action.postId,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UPDATE_IMAGES_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function* retweet(action) {
   try {
     const result = yield call(retweetAPI, action.data);
@@ -267,6 +292,48 @@ function* loadHashtagPosts(action) {
   }
 }
 
+function loadRelatePostsAPI(lastId) {
+  return axios.get(`/posts/related?lastId=${lastId || 0}`);
+}
+
+function* loadRelatePosts(action) {
+  try {
+    const result = yield call(loadRelatePostsAPI, action.lastId);
+
+    yield put({
+      type: LOAD_RELATE_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_RELATE_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function loadUnRelatePostsAPI(lastId) {
+  return axios.get(`/posts/unrelated?lastId=${lastId || 0}`);
+}
+
+function* loadUnRelatePosts(action) {
+  try {
+    const result = yield call(loadUnRelatePostsAPI, action.lastId);
+
+    yield put({
+      type: LOAD_UNRELATE_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_UNRELATE_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
 }
@@ -311,6 +378,18 @@ function* watchUpdatePost() {
   yield takeLatest(UPDATE_POST_REQUEST, updatePost);
 }
 
+function* watchUpdateImages() {
+  yield takeLatest(UPDATE_IMAGES_REQUEST, updateImages);
+}
+
+function* watchRelateLoadPosts() {
+  yield takeLatest(LOAD_RELATE_POSTS_REQUEST, loadRelatePosts);
+}
+
+function* watchUnRelateLoadPosts() {
+  yield takeLatest(LOAD_UNRELATE_POSTS_REQUEST, loadUnRelatePosts);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadUserPosts),
@@ -325,5 +404,8 @@ export default function* postSaga() {
     fork(watchRemovePost),
     fork(watchLoadPosts),
     fork(watchUpdatePost),
+    fork(watchUpdateImages),
+    fork(watchRelateLoadPosts),
+    fork(watchUnRelateLoadPosts),
   ]);
 }

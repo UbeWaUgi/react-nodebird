@@ -12,6 +12,7 @@ router.get('/', async (req,res,next) =>{ // GET /user
     console.log(req.headers);
     try {
         if(req.user) {
+            
             const fullUserWithoutPassword = await User.findOne({
                 where: {id: req.user.id},
                 attributes: {
@@ -227,14 +228,18 @@ router.delete('/:userId/follow', isLoggedIn, async(req, res, next) => { // DELET
 
 router.get('/followers', isLoggedIn, async(req, res, next) => { // PATCH /user/followers
     try{
-        const user = await User.findOne({where : {id : req.user.id}});
-
-        if(!user){
-            res.status(403).send('??????');
+        //get은 req.body로 받아오지않는다 그게 기본임
+       
+        const user = await User.findOne({ where: { id: req.user.id }});
+        if (!user) {
+          res.status(403).send('없는 사람을 찾으려고 하시네요?');
         }
-
+        
         const followers = await user.getFollowers({
-            limit:parseInt(req.query.limit),
+            attributes: {
+                exclude: ['password']
+            },
+            limit: parseInt(req.query.limit, 10),
         });
         //내가 그사람의 팔로워가 되는거니까!!
         //addFollower로 그사람의 팔로워가 되는거임.
@@ -248,14 +253,16 @@ router.get('/followers', isLoggedIn, async(req, res, next) => { // PATCH /user/f
 
 router.get('/followings', isLoggedIn, async(req, res, next) => { // PATCH /user/followers
     try{
-        const user = await User.findOne({where : {id : req.user.id}});
-
-        if(!user){
-            res.status(403).send('??????');
+        const user = await User.findOne({ where: { id: req.user.id }});
+        if (!user) {
+          res.status(403).send('없는 사람을 찾으려고 하시네요?');
         }
 
         const followings = await user.getFollowings({
-            limit:parseInt(req.query.limit),
+            attributes: {
+                exclude: ['password']
+            },
+            limit: parseInt(req.query.limit, 10),
         });
         //내가 그사람의 팔로워가 되는거니까!!
         //addFollower로 그사람의 팔로워가 되는거임.

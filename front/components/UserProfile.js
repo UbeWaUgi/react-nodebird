@@ -12,26 +12,25 @@ const UserProfile = () => {
   }, []);
 
   return (
-    <Card
-      actions={[
-        <div key="twit"><Link href={`/user/${me.id}`}><a>짹짹<br />{me.Posts.length}</a></Link></div>,
-        <div key="followings"><Link href="/profile"><a>팔로잉<br />{me.Followings.length}</a></Link></div>,
-        <div key="followings"><Link href="/profile"><a>팔로워<br />{me.Followers.length}</a></Link></div>,
-      ]}
-    >
-      <Card.Meta
-        avartar={(
-          <Link href={`/user/${me.id}`} prefetch={false}>
-            <a><Avatar>
-              {me.nickname[0]}
-            </Avatar>
-            </a>
-          </Link>
-)}
-        title={me.nickname}
-      />
-      <Button onClick={onLogOut} loading={logOutLoading}>로그아웃</Button>
-    </Card>
+    <>
+      <Card
+        actions={[
+          <div key="twit"><Link href={`/user/${me.id}`}><a>짹짹<br />{me.Posts.length}</a></Link></div>,
+          <div key="followings"><Link href="/profile" prefetch={false}><a>팔로잉<br />{me.Followings.length}</a></Link></div>,
+          <div key="followings"><Link href="/profile" prefetch={false}><a>팔로워<br />{me.Followers.length}</a></Link></div>,
+        ]}
+      >
+        <Card.Meta
+          avatar={(
+            <Link href={`/user/${me.id}`} prefetch={false}>
+              <a><Avatar>{me.nickname[0]}</Avatar></a>
+            </Link>
+        )}
+          title={me.nickname}
+        />
+        <Button onClick={onLogOut} loading={logOutLoading}>로그아웃</Button>
+      </Card>
+    </>
   );
 };
 

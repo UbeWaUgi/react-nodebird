@@ -27,6 +27,8 @@ const PostForm = () => {
     });
     formData.append('content', text);
 
+    console.log(formData);
+
     return dispatch({
       type: ADD_POST_REQUEST,
       data: formData,
@@ -83,7 +85,9 @@ const PostForm = () => {
       <div>
         {imagePaths.map((v, i) => (
           <div key={v} style={{ display: 'inline-block' }}>
-            <img src={`${v.replace(/\/thumb\//, '/original/')}`} style={{ width: '200px' }} alt={v} />
+            {process.env.NODE_ENV === 'production' ? (<img src={`${v.replace(/\/thumb\//, '/original/')}`} style={{ width: '200px' }} alt={v} />)
+              : (<img src={`${backUrl}/${v}`} style={{ width: '200px' }} alt={v} />) }
+
             <div>
               <Button onClick={onRemoveImage(i)}>제거</Button>
             </div>

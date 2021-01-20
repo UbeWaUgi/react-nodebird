@@ -8,6 +8,7 @@ import Router from 'next/router';
 import UserProfile from './UserProfile';
 import LoginForm from './LoginForm';
 import useInput from '../hooks/useInput';
+import RelatePostsGrid from './RelatePostsGrid';
 
 const SearchInput = styled(Input.Search)`
     vertical-align : middle;
@@ -71,13 +72,13 @@ const AppLayout = ({ children }) => {
         </Menu.Item>
       </Menu>
       <Row gutter={8}>
-        <Col xs={24} md={6}>
-          {me ? <UserProfile /> : <LoginForm />}
+        <Col xs={24} md={8}>
+          {me ? <><UserProfile /> <RelatePostsGrid /></> : <LoginForm />}
         </Col>
         <Col xs={24} md={12}>
           {children}
         </Col>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={4}>
           <a href="https://www.zerocho.com" target="_blank" rel="noreferrer noopener">Made by ZeroCho</a>
         </Col>
       </Row>

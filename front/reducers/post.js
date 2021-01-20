@@ -32,6 +32,9 @@ export const initialState = {
   uploadImagesLoading: false,
   uploadImagesDone: false,
   uploadImagesError: null,
+  updateImagesLoading: false,
+  updateImagesDone: false,
+  updateImagesError: null,
   retweetLoading: false,
   retweetDone: false,
   retweetError: null,
@@ -81,11 +84,27 @@ export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
 export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
 export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
 
+export const UPDATE_IMAGES_REQUEST = 'UPDATE_IMAGES_REQUEST';
+export const UPDATE_IMAGES_SUCCESS = 'UPDATE_IMAGES_SUCCESS';
+export const UPDATE_IMAGES_FAILURE = 'UPDATE_IMAGES_FAILURE';
+
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
+
+export const REMOVE_UPDATE_IMAGE = 'REMOVE_UPDATE_IMAGE';
+
+export const CANCLE_UPDATE_POST = 'CANCLE_UPDATE_POST';
 
 export const RETWEET_REQUEST = 'RETWEET_REQUEST';
 export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
 export const RETWEET_FAILURE = 'RETWEET_FAILURE';
+
+export const LOAD_RELATE_POSTS_REQUEST = 'LOAD_RELATE_POSTS_REQUEST';
+export const LOAD_RELATE_POSTS_SUCCESS = 'LOAD_RELATE_POSTS_SUCCESS';
+export const LOAD_RELATE_POSTS_FAILURE = 'LOAD_RELATE_POSTS_FAILURE';
+
+export const LOAD_UNRELATE_POSTS_REQUEST = 'LOAD_UNRELATE_POSTS_REQUEST';
+export const LOAD_UNRELATE_POSTS_SUCCESS = 'LOAD_UNRELATE_POSTS_SUCCESS';
+export const LOAD_UNRELATE_POSTS_FAILURE = 'LOAD_UNRELATE_POSTS_FAILURE';
 
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
@@ -103,6 +122,17 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case REMOVE_IMAGE:
       draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
       break;
+    case CANCLE_UPDATE_POST: {
+      const post = draft.mainPosts.find((v) => (v.id === action.postId));
+      post.Images = action.Images;
+      post.content = action.content;
+      break;
+    }
+    case REMOVE_UPDATE_IMAGE: {
+      const post = draft.mainPosts.find((v) => (v.id === action.postId));
+      post.Images = post.Images.filter((v, i) => i !== action.data);
+      break;
+    }
     case UPLOAD_IMAGES_REQUEST:
       draft.uploadImagesLoading = true;
       draft.uploadImagesDone = false;
@@ -117,6 +147,23 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case UPLOAD_IMAGES_FAILURE:
       draft.uploadImagesLoading = false;
       draft.uploadImagesError = action.error;
+      break;
+    case UPDATE_IMAGES_REQUEST:
+      draft.updateImagesLoading = true;
+      draft.updateImagesDone = false;
+      draft.updateImagesError = null;
+      break;
+    case UPDATE_IMAGES_SUCCESS: {
+      // const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+      const post = draft.mainPosts.find((v) => (v.id === action.postId));
+      post.Images = post.Images.concat(action.data);
+      draft.updateImagesLoading = false;
+      draft.updateImagesDone = true;
+      break;
+    }
+    case UPDATE_IMAGES_FAILURE:
+      draft.updateImagesLoading = false;
+      draft.updateImagesError = action.error;
       break;
     case RETWEET_REQUEST:
       draft.retweetLoading = true;
@@ -168,6 +215,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_USER_POSTS_REQUEST:
     case LOAD_HASHTAG_POSTS_REQUEST: // 결국 이세개 액션은 한페이지에 같이 쓰이는것이 아니기때문,
     case LOAD_POSTS_REQUEST: // 이렇게 state를 공유해서 쓸 수 있다.
+    case LOAD_RELATE_POSTS_REQUEST:
+    case LOAD_UNRELATE_POSTS_REQUEST:
       draft.loadPostsLoading = true;
       draft.loadPostsDone = false;
       draft.loadPostsError = null;
@@ -175,6 +224,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_USER_POSTS_SUCCESS:
     case LOAD_HASHTAG_POSTS_SUCCESS:
     case LOAD_POSTS_SUCCESS:
+    case LOAD_RELATE_POSTS_SUCCESS:
+    case LOAD_UNRELATE_POSTS_SUCCESS:
       draft.loadPostsLoading = false;
       draft.loadPostsDone = true;
       draft.mainPosts = draft.mainPosts.concat(action.data);
@@ -183,6 +234,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_USER_POSTS_FAILURE:
     case LOAD_HASHTAG_POSTS_FAILURE:
     case LOAD_POSTS_FAILURE:
+    case LOAD_RELATE_POSTS_FAILURE:
+    case LOAD_UNRELATE_POSTS_FAILURE:
       draft.loadPostsLoading = false;
       draft.loadPostsError = action.error;
       break;
@@ -223,10 +276,11 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case UPDATE_POST_SUCCESS:
       draft.updatePostLoading = false;
       draft.updatePostDone = true;
-      draft.mainPosts.find((v) => (v.id === action.data.PostId
+      console.log(action.data);
+      draft.mainPosts.find((v) => (v.id === action.data.id
         && { content: action.data.content,
+          Images: action.data.Images,
         }));
-
       break;
     case UPDATE_POST_FAILURE:
       draft.updatePostLoading = false;

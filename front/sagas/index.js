@@ -6,6 +6,7 @@ import userSaga from './user';
 import { backUrl } from '../config/config';
 
 // axios.defaults.baseURL = 'http://localhost:3065';
+
 axios.defaults.baseURL = backUrl;
 axios.defaults.withCredentials = true; // 사가에서 보내는 axios 는 withCredentials가 트루가 공통적으로 들어간다.
 

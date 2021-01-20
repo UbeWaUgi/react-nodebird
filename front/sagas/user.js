@@ -159,6 +159,7 @@ function* changeNickname(action) {
 
 function* loadFollowers(action) {
   try {
+    console.log(action.data);
     const result = yield call(loadFollowersAPI, action.data);
     yield put({
       type: LOAD_FOLLOWERS_SUCCESS,

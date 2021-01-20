@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import Head from 'next/head';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Router from 'next/router';
 import axios from 'axios';
 import { END } from 'redux-saga';
@@ -15,27 +15,48 @@ import { backUrl } from '../config/config';
 const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
 
 const Profile = () => {
-  // const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
 
   const [followersLimit, setFollowersLimit] = useState(3);
   const [followingsLimit, setFollowingsLimit] = useState(3);
+
   const { data: followersData, error: followerError } = useSWR(`${backUrl}/user/followers?limit=${followersLimit}`, fetcher);
   // fetcher 해당 인자 주소를 실제로 어떻게 가지고올것인지!
   const { data: followingsData, error: followingError } = useSWR(`${backUrl}/user/followings?limit=${followingsLimit}`, fetcher);
   // data, error 둘다 없으면 로딩중
 
+  // 위에 SWR를 사용해서 직접 팔로워 정보를 가지고오니 dispatch 빼자
   /*
-  위에 SWR를 사용해서 직접 팔로워 정보를 가지고오니 dispatch 빼자
   useEffect(() => {
     dispatch({
       type: LOAD_FOLLOWERS_REQUEST,
+      data: { limit: 3 },
     });
+  }, [followersLimit]);
+
+  useEffect(() => {
     dispatch({
       type: LOAD_FOLLOWINGS_REQUEST,
+      data: { limit: 3 },
+    });
+  }, [followingsLimit]);
+*/
+
+  /*
+  useEffect(() => {
+    dispatch({
+      type: LOAD_FOLLOWERS_REQUEST,
+      data: { limit: 3 },
     });
   }, []);
-*/
+
+  useEffect(() => {
+    dispatch({
+      type: LOAD_FOLLOWINGS_REQUEST,
+      data: { limit: 3 },
+    });
+  }, []);
+  */
 
   useEffect(() => {
     if (!(me && me.id)) {
@@ -56,10 +77,12 @@ const Profile = () => {
   }
 
   // return이 hooks보다 위에 있을수는 없다. 있다면 에러발생
+  /*
   if (followerError || followingError) {
     console.error(followerError || followingError);
     return '팔로잉/팔로워 로딩 중 에러가 발생합니다.';
   }
+  */
 
   return (
     <>

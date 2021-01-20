@@ -13,8 +13,6 @@ const ImgStyle = styled.img`
 `;
 
 const PostImages = ({ images }) => {
-  // console.log(images);
-
   const [showImagesZoom, setShowImagesZoom] = useState(false);
 
   const onZoom = useCallback(() => {
@@ -28,22 +26,49 @@ const PostImages = ({ images }) => {
   if (images.length === 1) {
     return (
       <>
-        <img role="presentation" src={`${images[0].src}`} alt={images[0].src} onClick={onZoom} />
+        <img
+          role="presentation"
+          src={process.env.NODE_ENV === 'production'
+            ? (`${images[0].src}`) : (`${backUrl}/${images[0].src}`)}
+          alt={images[0].src}
+          onClick={onZoom}
+        />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
       </>
     );
   } if (images.length === 2) {
     return (
       <>
-        <ImgStyle role="presentation" style={{ width: '50%', display: 'inline-block' }} src={`${images[0].src}`} alt={images[0].src} onClick={onZoom} />
-        <ImgStyle role="presentation" style={{ width: '50%', display: 'inline-block' }} src={`${images[1].src}`} alt={images[1].src} onClick={onZoom} />
+        <ImgStyle
+          role="presentation"
+          style={{ width: '50%', display: 'inline-block' }}
+          src={process.env.NODE_ENV === 'production'
+            ? (`${images[0].src}`) : (`${backUrl}/${images[0].src}`)}
+          alt={images[0].src}
+          onClick={onZoom}
+        />
+        <ImgStyle
+          role="presentation"
+          style={{ width: '50%', display: 'inline-block' }}
+          src={process.env.NODE_ENV === 'production'
+            ? (`${images[1].src}`) : (`${backUrl}/${images[1].src}`)}
+          alt={images[1].src}
+          onClick={onZoom}
+        />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
       </>
     );
   } if (images.length > 2) {
     return (
       <div>
-        <ImgStyle role="presentation" style={{ width: '50%', display: 'inline-block' }} src={`${images[0].src}`} alt={images[0].src} onClick={onZoom} />
+        <ImgStyle
+          role="presentation"
+          style={{ width: '50%', display: 'inline-block' }}
+          src={process.env.NODE_ENV === 'production'
+            ? (`${images[0].src}`) : (`${backUrl}/${images[0].src}`)}
+          alt={images[0].src}
+          onClick={onZoom}
+        />
         <div
           role="presentation"
           style={{ display: 'inline-block', width: '50%', textAlign: 'center', verticalAlign: 'middle' }}
