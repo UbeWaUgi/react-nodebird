@@ -106,6 +106,10 @@ export const LOAD_UNRELATE_POSTS_REQUEST = 'LOAD_UNRELATE_POSTS_REQUEST';
 export const LOAD_UNRELATE_POSTS_SUCCESS = 'LOAD_UNRELATE_POSTS_SUCCESS';
 export const LOAD_UNRELATE_POSTS_FAILURE = 'LOAD_UNRELATE_POSTS_FAILURE';
 
+export const LOAD_DATE_POSTS_REQUEST = 'LOAD_DATE_POSTS_REQUEST';
+export const LOAD_DATE_POSTS_SUCCESS = 'LOAD_DATE_POSTS_SUCCESS';
+export const LOAD_DATE_POSTS_FAILURE = 'LOAD_DATE_POSTS_FAILURE';
+
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
   data,
@@ -217,6 +221,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_POSTS_REQUEST: // 이렇게 state를 공유해서 쓸 수 있다.
     case LOAD_RELATE_POSTS_REQUEST:
     case LOAD_UNRELATE_POSTS_REQUEST:
+    case LOAD_DATE_POSTS_REQUEST:
       draft.loadPostsLoading = true;
       draft.loadPostsDone = false;
       draft.loadPostsError = null;
@@ -226,6 +231,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_POSTS_SUCCESS:
     case LOAD_RELATE_POSTS_SUCCESS:
     case LOAD_UNRELATE_POSTS_SUCCESS:
+    case LOAD_DATE_POSTS_SUCCESS:
       draft.loadPostsLoading = false;
       draft.loadPostsDone = true;
       draft.mainPosts = draft.mainPosts.concat(action.data);
@@ -236,6 +242,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_POSTS_FAILURE:
     case LOAD_RELATE_POSTS_FAILURE:
     case LOAD_UNRELATE_POSTS_FAILURE:
+    case LOAD_DATE_POSTS_FAILURE:
       draft.loadPostsLoading = false;
       draft.loadPostsError = action.error;
       break;

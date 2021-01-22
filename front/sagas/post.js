@@ -12,7 +12,8 @@ import { ADD_POST_REQUEST, ADD_POST_SUCCESS, ADD_POST_FAILURE,
   UPDATE_POST_REQUEST, UPDATE_POST_SUCCESS, UPDATE_POST_FAILURE,
   UPDATE_IMAGES_REQUEST, UPDATE_IMAGES_SUCCESS, UPDATE_IMAGES_FAILURE,
   LOAD_RELATE_POSTS_REQUEST, LOAD_RELATE_POSTS_SUCCESS, LOAD_RELATE_POSTS_FAILURE,
-  LOAD_UNRELATE_POSTS_REQUEST, LOAD_UNRELATE_POSTS_SUCCESS, LOAD_UNRELATE_POSTS_FAILURE } from '../reducers/post';
+  LOAD_UNRELATE_POSTS_REQUEST, LOAD_UNRELATE_POSTS_SUCCESS, LOAD_UNRELATE_POSTS_FAILURE,
+  LOAD_DATE_POSTS_REQUEST, LOAD_DATE_POSTS_SUCCESS, LOAD_DATE_POSTS_FAILURE } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_TO_ME } from '../reducers/user';
 
 function addPostAPI(data) {
@@ -334,6 +335,27 @@ function* loadUnRelatePosts(action) {
   }
 }
 
+function loadDatePostsAPI(lastId, date) {
+  return axios.get(`/posts/datePosts?date=${date}&lastId=${lastId || 0}`);
+}
+
+function* loadDatePosts(action) {
+  try {
+    const result = yield call(loadDatePostsAPI, action.lastId, action.date);
+
+    yield put({
+      type: LOAD_DATE_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_DATE_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
 }
@@ -390,6 +412,10 @@ function* watchUnRelateLoadPosts() {
   yield takeLatest(LOAD_UNRELATE_POSTS_REQUEST, loadUnRelatePosts);
 }
 
+function* watchDateLoadPosts() {
+  yield takeLatest(LOAD_DATE_POSTS_REQUEST, loadDatePosts);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadUserPosts),
@@ -407,5 +433,6 @@ export default function* postSaga() {
     fork(watchUpdateImages),
     fork(watchRelateLoadPosts),
     fork(watchUnRelateLoadPosts),
+    fork(watchDateLoadPosts),
   ]);
 }

@@ -9,6 +9,7 @@ import UserProfile from './UserProfile';
 import LoginForm from './LoginForm';
 import useInput from '../hooks/useInput';
 import RelatePostsGrid from './RelatePostsGrid';
+import MiniCalendar from './MiniCalendar';
 
 const SearchInput = styled(Input.Search)`
     vertical-align : middle;
@@ -73,7 +74,7 @@ const AppLayout = ({ children }) => {
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={8}>
-          {me ? <><UserProfile /> <RelatePostsGrid /></> : <LoginForm />}
+          {me ? <><UserProfile /> <RelatePostsGrid /> <MiniCalendar /></> : <LoginForm />}
         </Col>
         <Col xs={24} md={12}>
           {children}
